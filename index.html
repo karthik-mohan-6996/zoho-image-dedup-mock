@@ -3,927 +3,667 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zoho CRM - Image Deduplication Mock</title>
+<title>Zoho CRM - Image Deduplication</title>
 <style>
-  /* ===== RESET & BASE ===== */
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f3f4f6;color:#333;font-size:14px;line-height:1.5}
-  a{color:#1890ff;text-decoration:none;cursor:pointer}
-  a:hover{text-decoration:underline}
-  button{cursor:pointer;font-family:inherit;font-size:14px;border:none;border-radius:4px;padding:8px 18px;transition:.2s}
-  input,select{font-family:inherit;font-size:14px}
-  .hidden{display:none!important}
-  img{max-width:100%}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f4f6f9;color:#333;font-size:14px;line-height:1.5}
+a{color:#2b7de9;text-decoration:none;cursor:pointer}
+a:hover{text-decoration:underline}
+button{cursor:pointer;font-family:inherit;font-size:13px;border:none;border-radius:3px;padding:7px 16px;transition:.15s}
+input,select{font-family:inherit;font-size:13px}
+.hidden{display:none!important}
 
-  /* ===== NAV BAR ===== */
-  .crm-topbar{background:#1b2a4a;color:#fff;display:flex;align-items:center;padding:0 20px;height:48px;position:sticky;top:0;z-index:100}
-  .crm-topbar .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
-  .crm-topbar .logo svg{width:22px;height:22px}
-  .crm-topbar nav{display:flex;gap:4px;margin-left:24px}
-  .crm-topbar nav a{color:#c8d6e5;padding:12px 14px;font-size:13px;display:block}
-  .crm-topbar nav a:hover,.crm-topbar nav a.active{color:#fff;background:rgba(255,255,255,.1);text-decoration:none;border-radius:4px 4px 0 0}
-  .crm-topbar .topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
-  .crm-topbar .topbar-right .icon-btn{background:none;border:none;color:#c8d6e5;padding:4px;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
-  .crm-topbar .topbar-right .icon-btn:hover{background:rgba(255,255,255,.15);color:#fff}
-  .crm-topbar .avatar{width:30px;height:30px;border-radius:50%;background:#4a90d9;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+/* TOP BAR */
+.topbar{background:#1b2a4a;height:44px;display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:500;color:#fff}
+.topbar .logo{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;margin-right:8px}
+.topbar .all-tabs{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:3px;padding:4px 12px;font-size:12px;margin-right:12px}
+.topbar nav{display:flex;gap:0}
+.topbar nav a{color:#a8b9d0;padding:11px 14px;font-size:13px;display:block;white-space:nowrap}
+.topbar nav a:hover,.topbar nav a.active{color:#fff;text-decoration:none;background:rgba(255,255,255,.08)}
+.topbar .right-icons{margin-left:auto;display:flex;align-items:center;gap:10px}
+.topbar .right-icons button{background:none;border:none;color:#a8b9d0;font-size:16px;padding:4px 6px;border-radius:3px}
+.topbar .right-icons button:hover{color:#fff;background:rgba(255,255,255,.1)}
+.topbar .avatar{width:28px;height:28px;border-radius:50%;background:#5b8def;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
 
-  /* ===== LAYOUT ===== */
-  .page-body{max-width:1200px;margin:0 auto;padding:24px}
-  .card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:24px;margin-bottom:20px}
-  .card-title{font-size:18px;font-weight:600;margin-bottom:4px}
-  .card-desc{color:#666;font-size:13px;margin-bottom:16px}
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:44px;bottom:0;width:210px;background:#fff;border-right:1px solid #e3e8ee;padding:16px 0;z-index:50;overflow-y:auto}
+.sidebar h4{padding:0 16px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:10px;font-weight:600}
+.sidebar .nav-item{display:block;padding:9px 16px;color:#555;font-size:12px;cursor:pointer;transition:.1s;border-left:3px solid transparent}
+.sidebar .nav-item:hover{background:#f0f4ff;color:#2b7de9;text-decoration:none}
+.sidebar .nav-item.active{background:#e8f0fe;color:#2b7de9;font-weight:600;border-left-color:#2b7de9}
+.sidebar .divider{height:1px;background:#e8e8e8;margin:10px 16px}
+.main{margin-left:210px;padding:20px 24px;max-width:1100px}
 
-  /* ===== TABS ===== */
-  .zia-tabs{display:flex;border-bottom:2px solid #e8e8e8;margin-bottom:24px}
-  .zia-tabs .tab{padding:10px 20px;font-size:14px;color:#666;cursor:pointer;position:relative}
-  .zia-tabs .tab:hover{color:#333}
-  .zia-tabs .tab.active{color:#1a73e8;font-weight:600}
-  .zia-tabs .tab.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:#1a73e8}
+.card{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:20px 24px;margin-bottom:16px}
+.screen-label{background:#2b7de9;color:#fff;padding:4px 12px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;display:inline-block;margin-bottom:14px}
+.btn-blue{background:#2b7de9;color:#fff;font-weight:500;border-radius:3px}
+.btn-blue:hover{background:#1a68d1}
+.btn-red{background:#e25c5c;color:#fff;font-weight:500}
+.btn-red:hover{background:#c94444}
+.btn-outline{background:#fff;color:#333;border:1px solid #d0d5dd;font-weight:500}
+.btn-outline:hover{border-color:#2b7de9;color:#2b7de9}
+.btn-green{background:#28a745;color:#fff;font-weight:500}
 
-  /* ===== CONFIG TABLE ===== */
-  .config-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-  .config-header h2{font-size:16px;font-weight:600}
-  .note-box{background:#fef9e7;border-left:3px solid #f5c518;padding:10px 14px;border-radius:4px;font-size:13px;color:#555;margin-bottom:20px}
-  .note-box strong{color:#333}
-  .btn-primary{background:#1a73e8;color:#fff;font-weight:500}
-  .btn-primary:hover{background:#1557b0}
-  .btn-danger{background:#e74c3c;color:#fff;font-weight:500}
-  .btn-danger:hover{background:#c0392b}
-  .btn-outline{background:#fff;color:#333;border:1px solid #d9d9d9;font-weight:500}
-  .btn-outline:hover{border-color:#1a73e8;color:#1a73e8}
-  .btn-success{background:#27ae60;color:#fff;font-weight:500}
-  .btn-success:hover{background:#219a52}
+.zia-tabs{display:flex;border-bottom:2px solid #e8e8e8;margin-bottom:20px}
+.zia-tabs .tab{padding:10px 18px;font-size:13px;color:#666;cursor:pointer;position:relative}
+.zia-tabs .tab.active{color:#2b7de9;font-weight:600}
+.zia-tabs .tab.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2.5px;background:#2b7de9;border-radius:2px}
+.note-box{background:#fef9e7;border-left:3px solid #f0c000;padding:9px 14px;border-radius:3px;font-size:12px;color:#555;margin-bottom:16px}
+.note-box b{color:#333}
+.help-link{float:right;font-size:12px;color:#2b7de9;display:flex;align-items:center;gap:4px}
 
-  .mod-table{width:100%;border-collapse:collapse}
-  .mod-table th{text-align:left;padding:12px 16px;background:#f8f9fa;font-weight:600;color:#555;font-size:13px;border-bottom:1px solid #e8e8e8}
-  .mod-table td{padding:12px 16px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
-  .mod-table tr:hover td{background:#f8fbff}
-  .status-toggle{position:relative;display:inline-block;width:42px;height:22px}
-  .status-toggle input{opacity:0;width:0;height:0}
-  .status-toggle .slider{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:22px;transition:.3s}
-  .status-toggle .slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
-  .status-toggle input:checked+.slider{background:#27ae60}
-  .status-toggle input:checked+.slider::before{transform:translateX(20px)}
-  .status-icon{display:inline-flex;align-items:center;gap:6px}
-  .status-icon .spinner{width:16px;height:16px;border:2px solid #ddd;border-top-color:#1a73e8;border-radius:50%;animation:spin 1s linear infinite}
-  .status-icon .warn{color:#e67e22;font-size:16px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .delete-btn{background:none;border:none;color:#999;font-size:16px;padding:4px 8px;border-radius:4px}
-  .delete-btn:hover{color:#e74c3c;background:#fef0f0}
-  .created-by{display:flex;align-items:center;gap:8px}
-  .created-by .av{width:28px;height:28px;border-radius:50%;background:#e8d5f5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#7b2d8e}
-  .help-link{color:#1a73e8;font-size:13px;display:flex;align-items:center;gap:4px;float:right}
+.mod-table{width:100%;border-collapse:collapse}
+.mod-table th{text-align:left;padding:10px 14px;font-size:12px;color:#888;font-weight:600;border-bottom:1px solid #e8e8e8;background:#fafbfc}
+.mod-table td{padding:10px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.mod-table tr:hover td{background:#f8faff}
+.toggle{position:relative;display:inline-block;width:38px;height:20px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .sl{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:20px;transition:.25s}
+.toggle .sl::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.25s}
+.toggle input:checked+.sl{background:#28a745}
+.toggle input:checked+.sl::before{transform:translateX(18px)}
+.created-by{display:flex;align-items:center;gap:8px;font-size:13px}
+.created-by .av{width:26px;height:26px;border-radius:50%;background:#e0d1f0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6b3fa0}
+.status-wrap{display:flex;align-items:center;gap:6px}
+.spinner{width:14px;height:14px;border:2px solid #ddd;border-top-color:#2b7de9;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.warn{color:#e89d0e;font-size:15px}
+.del-btn{background:none;border:none;color:#bbb;font-size:15px;padding:2px 6px;border-radius:3px}
+.del-btn:hover{color:#e25c5c;background:#fef0f0}
 
-  /* ===== MODAL ===== */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center}
-  .modal{background:#fff;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,.2);max-width:560px;width:90%;max-height:85vh;overflow-y:auto;position:relative}
-  .modal-header{padding:20px 24px 0;display:flex;justify-content:space-between;align-items:center}
-  .modal-header h3{font-size:18px;font-weight:600}
-  .modal-close{background:none;border:none;font-size:22px;color:#999;padding:4px 8px;border-radius:4px}
-  .modal-close:hover{color:#333;background:#f0f0f0}
-  .modal-body{padding:16px 24px}
-  .modal-footer{padding:16px 24px 20px;display:flex;justify-content:flex-end;gap:10px}
-  .form-group{margin-bottom:16px}
-  .form-group label{display:block;font-weight:500;margin-bottom:6px;color:#555}
-  .form-group select,.form-group input{width:100%;padding:10px 12px;border:1px solid #d9d9d9;border-radius:6px;outline:none}
-  .form-group select:focus,.form-group input:focus{border-color:#1a73e8;box-shadow:0 0 0 2px rgba(26,115,232,.15)}
+.rec-header{display:flex;align-items:center;gap:16px;padding:14px 0}
+.rec-img-wrap{position:relative;flex-shrink:0}
+.rec-img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0}
+.find-dup-btn{position:absolute;bottom:-2px;right:-4px;width:26px;height:26px;border-radius:50%;background:#2b7de9;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2);border:2px solid #fff;transition:.15s}
+.find-dup-btn:hover{transform:scale(1.12);background:#1a68d1}
+.find-dup-btn .tip{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:5px 10px;border-radius:4px;font-size:10px;white-space:nowrap;opacity:0;pointer-events:none;transition:.15s}
+.find-dup-btn:hover .tip{opacity:1}
+.rec-info h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.rec-info .sub{font-size:12px;color:#888}
+.rec-actions{margin-left:auto;display:flex;gap:8px}
+.rec-actions button{font-size:12px;padding:6px 16px}
+.detail-tabs{display:flex;gap:0;margin-bottom:16px}
+.detail-tabs .dt{padding:8px 18px;font-size:12px;color:#555;cursor:pointer;border:1px solid #d0d5dd;background:#fff}
+.detail-tabs .dt:first-child{border-radius:16px 0 0 16px}
+.detail-tabs .dt:last-child{border-radius:0 16px 16px 0}
+.detail-tabs .dt.active{background:#2b7de9;color:#fff;border-color:#2b7de9}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.field-row{display:flex;padding:8px 14px;border-bottom:1px solid #f0f0f0}
+.field-row .fl{width:140px;flex-shrink:0;color:#888;font-size:12px}
+.field-row .fv{font-size:13px}
+.dup-warning{color:#e25c5c;font-size:12px;margin-top:6px;line-height:1.5}
+.dup-warning a{color:#2b7de9;font-weight:500}
 
-  /* ===== RECORD PAGE ===== */
-  .record-header{display:flex;align-items:center;gap:20px;padding:20px 0}
-  .record-img-wrap{position:relative;width:80px;height:80px}
-  .record-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e8e8e8}
-  .find-dup-icon{position:absolute;bottom:0;right:-4px;width:28px;height:28px;border-radius:50%;background:#1a73e8;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);font-size:14px;transition:.2s}
-  .find-dup-icon:hover{transform:scale(1.1);background:#1557b0}
-  .find-dup-icon .tooltip{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:6px 10px;border-radius:6px;font-size:11px;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s}
-  .find-dup-icon:hover .tooltip{opacity:1}
-  .record-info h1{font-size:22px;font-weight:600}
-  .record-info .tags{color:#888;font-size:13px;display:flex;align-items:center;gap:6px}
-  .record-actions{margin-left:auto;display:flex;gap:10px}
-  .record-actions button{padding:8px 20px;font-size:13px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:600;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.18);width:90%;position:relative;overflow:hidden}
+.modal-sm{max-width:440px}
+.modal-md{max-width:580px}
+.modal-lg{max-width:680px}
+.m-head{padding:16px 20px 0;display:flex;justify-content:space-between;align-items:center}
+.m-head h3{font-size:16px;font-weight:600}
+.m-close{background:none;border:none;font-size:20px;color:#999;padding:2px 6px;border-radius:3px}
+.m-close:hover{color:#333;background:#f0f0f0}
+.m-body{padding:14px 20px}
+.m-foot{padding:12px 20px 16px;display:flex;justify-content:flex-end;gap:8px}
 
-  /* record detail grid */
-  .record-detail{display:grid;grid-template-columns:1fr 1fr;gap:0}
-  .record-detail .field{display:flex;padding:10px 16px;border-bottom:1px solid #f0f0f0}
-  .record-detail .field .label{width:160px;flex-shrink:0;color:#888;font-size:13px}
-  .record-detail .field .value{font-size:13px;color:#333}
+.dup-info{background:#eef5ff;border:1px solid #b8d4ff;border-radius:6px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
+.dup-info img{width:40px;height:40px;border-radius:50%;flex-shrink:0;object-fit:cover}
+.dup-info .txt{font-size:12px;color:#333;line-height:1.5}
+.dup-info .note-italic{font-style:italic;color:#888;font-size:11px;margin-top:3px}
+.mark-row{padding:6px 0}
+.mark-row label{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer}
+.mark-row input[type="checkbox"]{width:16px;height:16px;accent-color:#2b7de9}
+.dup-title{font-size:14px;font-weight:600;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.dup-title .cnt{background:#e8e8e8;color:#555;font-size:11px;padding:1px 8px;border-radius:10px;font-weight:500}
+.dup-list{border:1px solid #e8e8e8;border-radius:6px;max-height:300px;overflow-y:auto}
+.dup-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f0f0;transition:.1s}
+.dup-item:last-child{border-bottom:none}
+.dup-item:hover{background:#f8faff}
+.dup-item .cb{width:16px;height:16px;accent-color:#2b7de9;flex-shrink:0}
+.dup-item img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.dup-item .info{flex:1;min-width:0}
+.dup-item .info .nm{font-weight:600;font-size:13px}
+.dup-item .info .em{font-size:11px;color:#888}
+.dup-item .actions{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.dup-item .merge-link{font-size:11px;color:#2b7de9;white-space:nowrap;padding:3px 8px;border:1px solid #2b7de9;border-radius:3px}
+.dup-item .merge-link:hover{background:#2b7de9;color:#fff;text-decoration:none}
+.perm-note{background:#fff3cd;border:1px solid #ffe69c;border-radius:4px;padding:8px 12px;font-size:11px;color:#856404;margin-top:8px}
+.unique-badge{display:inline-flex;align-items:center;gap:3px;background:#d4edda;color:#155724;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600}
 
-  /* ===== DUPLICATE POPUP ===== */
-  .dup-modal{max-width:620px}
-  .dup-info-box{background:#eef6ff;border:1px solid #b8d8ff;border-radius:8px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:12px}
-  .dup-info-box .dup-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;object-fit:cover}
-  .dup-info-box .dup-text{font-size:13px;color:#333;line-height:1.6}
-  .dup-info-box .dup-note{font-style:italic;color:#888;font-size:12px;margin-top:4px}
-  .mark-unique-wrap{padding:8px 0 4px 0}
-  .mark-unique-wrap label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#333}
-  .mark-unique-wrap input[type="checkbox"]{width:18px;height:18px;accent-color:#1a73e8}
-  .dup-section-title{font-size:15px;font-weight:600;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
-  .dup-section-title .count{background:#e8e8e8;color:#555;font-size:12px;padding:2px 8px;border-radius:10px;font-weight:500}
-  .dup-list{border:1px solid #e8e8e8;border-radius:8px;max-height:320px;overflow-y:auto}
-  .dup-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f0f0f0;transition:.15s}
-  .dup-item:last-child{border-bottom:none}
-  .dup-item:hover{background:#f8fbff}
-  .dup-item .dup-item-img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
-  .dup-item .dup-item-info{flex:1;min-width:0}
-  .dup-item .dup-item-info .name{font-weight:600;font-size:13px;color:#333}
-  .dup-item .dup-item-info .email{font-size:12px;color:#888}
-  .dup-item .dup-item-actions{display:flex;gap:6px;align-items:center}
-  .dup-item .unique-cb{width:16px;height:16px;accent-color:#1a73e8}
-  .dup-item .merge-link{font-size:12px;color:#1a73e8;white-space:nowrap}
-  .dup-item .merge-link:hover{text-decoration:underline}
-  .perm-note{background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:10px 14px;font-size:12px;color:#856404;margin-top:10px}
+.match-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.match-bar .sel{font-weight:600;color:#2b7de9;font-size:13px}
+.match-bar .clr{font-size:12px;color:#666;cursor:pointer}
+.match-bar .clr:hover{color:#e25c5c}
+.m-table{width:100%;border-collapse:collapse;font-size:12px}
+.m-table th{text-align:left;padding:8px 12px;background:#f8f9fa;font-size:11px;color:#888;font-weight:600;border-bottom:1px solid #e0e0e0;text-transform:uppercase;letter-spacing:.3px}
+.m-table td{padding:8px 12px;border-bottom:1px solid #f0f0f0}
+.m-table tr.selected td{background:#eef5ff}
+.m-table tr:hover td{background:#f8faff}
+.m-table input[type="checkbox"]{width:15px;height:15px;accent-color:#2b7de9}
 
-  /* ===== MERGE PAGE ===== */
-  .merge-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-  .merge-topbar h2{font-size:20px;font-weight:600;display:flex;align-items:center;gap:8px}
-  .merge-topbar .info-icon{width:20px;height:20px;border-radius:50%;border:1px solid #999;display:flex;align-items:center;justify-content:center;font-size:12px;color:#999;cursor:pointer}
-  .merge-grid{display:grid;grid-template-columns:200px repeat(var(--cols,3),1fr);border:1px solid #e0e0e0;border-radius:8px;overflow-x:auto}
-  .merge-grid .cell{padding:12px 16px;border-bottom:1px solid #f0f0f0;border-right:1px solid #f0f0f0;font-size:13px;display:flex;align-items:center;gap:8px;min-height:52px}
-  .merge-grid .cell:last-child{border-right:none}
-  .merge-grid .header{background:#f0f4ff;font-weight:600;color:#333;font-size:13px}
-  .merge-grid .field-label{background:#fafbfc;font-weight:500;color:#666}
-  .merge-grid .master-col{background:#fffbf0;border:2px solid #f5c518;border-radius:0}
-  .merge-grid .img-cell{justify-content:center}
-  .merge-grid .img-cell img{width:48px;height:48px;border-radius:50%;object-fit:cover}
-  .merge-grid .radio-cell{display:flex;align-items:center;gap:8px}
-  .merge-grid .radio-cell input[type="radio"]{accent-color:#1a73e8;width:16px;height:16px}
-  .merge-grid .select-all{color:#1a73e8;font-size:12px;cursor:pointer;margin-left:4px}
-  .merge-grid .selected-val{color:#1a73e8;font-weight:500;border:1px solid #1a73e8;border-radius:4px;padding:2px 6px}
+.merge-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.merge-top h2{font-size:18px;font-weight:600;display:flex;align-items:center;gap:6px}
+.merge-top .info-i{width:18px;height:18px;border-radius:50%;border:1px solid #999;display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#888}
+.mg{display:grid;border:1px solid #e0e0e0;border-radius:6px;overflow-x:auto}
+.mg .c{padding:10px 14px;border-bottom:1px solid #f0f0f0;border-right:1px solid #f0f0f0;font-size:12px;display:flex;align-items:center;gap:6px;min-height:46px}
+.mg .c:nth-child(5n){border-right:none}
+.mg .hdr{background:#f0f4ff;font-weight:600;font-size:12px;color:#333}
+.mg .lbl{background:#fafbfc;font-weight:500;color:#666}
+.mg .master{background:#fffdf5}
+.mg .master-border{border-left:2px solid #e25c5c;border-right:2px solid #e25c5c}
+.mg .master-top{border-top:2px solid #e25c5c}
+.mg .master-bot{border-bottom:2px solid #e25c5c}
+.mg .img-c{justify-content:center}
+.mg .img-c img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.mg input[type="radio"]{accent-color:#2b7de9;width:14px;height:14px}
+.mg .sel-val{color:#2b7de9;font-weight:600;border:1px solid #2b7de9;border-radius:3px;padding:1px 5px;font-size:11px}
+.mg .sel-all{color:#2b7de9;font-size:11px;cursor:pointer;margin-left:4px}
 
-  /* ===== MATCHING RECORDS ===== */
-  .match-header{margin-bottom:16px}
-  .match-header h3{font-size:16px;font-weight:600;margin-bottom:4px}
-  .match-header p{color:#666;font-size:12px;line-height:1.5}
-  .match-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-  .match-toolbar .sel-count{font-weight:600;color:#1a73e8}
-  .match-toolbar .clear-btn{color:#666;font-size:13px;cursor:pointer}
-  .match-toolbar .clear-btn:hover{color:#e74c3c}
-  .match-table{width:100%;border-collapse:collapse}
-  .match-table th{text-align:left;padding:10px 14px;background:#f8f9fa;font-size:12px;color:#888;font-weight:600;border-bottom:1px solid #e8e8e8;text-transform:uppercase;letter-spacing:.3px}
-  .match-table td{padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:13px}
-  .match-table tr:hover td{background:#f8fbff}
-  .match-table input[type="checkbox"]{width:16px;height:16px;accent-color:#1a73e8}
+.banner{padding:10px 16px;border-radius:4px;font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.banner.ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+.banner.err{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+.banner .bx{margin-left:auto;background:none;border:none;font-size:16px;color:inherit;opacity:.5;padding:0}
+.banner .bx:hover{opacity:1}
 
-  /* ===== SUCCESS BANNER ===== */
-  .banner{padding:12px 20px;border-radius:6px;font-size:14px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
-  .banner.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
-  .banner.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
-  .banner.warning{background:#fff3cd;color:#856404;border:1px solid #ffeeba}
-  .banner .close-banner{margin-left:auto;background:none;border:none;font-size:18px;color:inherit;opacity:.6;padding:0 4px}
-  .banner .close-banner:hover{opacity:1}
-
-  /* ===== SIDEBAR NAV ===== */
-  .demo-nav{position:fixed;left:0;top:48px;bottom:0;width:220px;background:#fff;border-right:1px solid #e8e8e8;padding:20px 0;z-index:50;overflow-y:auto}
-  .demo-nav h4{padding:0 20px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:12px}
-  .demo-nav .nav-item{display:block;padding:10px 20px;color:#555;font-size:13px;cursor:pointer;transition:.15s}
-  .demo-nav .nav-item:hover{background:#f0f4ff;color:#1a73e8;text-decoration:none}
-  .demo-nav .nav-item.active{background:#e8f0fe;color:#1a73e8;font-weight:600;border-right:3px solid #1a73e8}
-  .demo-nav .divider{height:1px;background:#e8e8e8;margin:12px 20px}
-  .page-with-sidebar{margin-left:220px}
-
-  /* ===== RECORD DETAIL VIEW ===== */
-  .detail-tabs{display:flex;gap:0;margin-bottom:20px}
-  .detail-tabs .dtab{padding:10px 20px;font-size:13px;color:#666;cursor:pointer;border:1px solid #e8e8e8;background:#fff}
-  .detail-tabs .dtab:first-child{border-radius:20px 0 0 20px}
-  .detail-tabs .dtab:last-child{border-radius:0 20px 20px 0}
-  .detail-tabs .dtab.active{background:#1a73e8;color:#fff;border-color:#1a73e8}
-  .section-title{font-size:14px;font-weight:600;padding:10px 0;border-bottom:2px solid #1a73e8;margin-bottom:12px;display:inline-block}
-
-  /* duplicate warning */
-  .dup-warning{color:#e74c3c;font-size:13px;margin-top:8px}
-  .dup-warning a{color:#1a73e8}
-
-  /* Unique-marked badge */
-  .unique-badge{display:inline-flex;align-items:center;gap:4px;background:#d4edda;color:#155724;font-size:11px;padding:3px 8px;border-radius:10px;font-weight:500}
-
-  /* Screen title */
-  .screen-label{background:#1a73e8;color:#fff;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:inline-block;margin-bottom:16px}
-
-  /* Responsive */
-  @media(max-width:900px){
-    .demo-nav{display:none}
-    .page-with-sidebar{margin-left:0}
-    .merge-grid{font-size:12px}
-  }
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}}
 </style>
 </head>
 <body>
 
-<!-- ===== TOP BAR ===== -->
-<div class="crm-topbar">
-  <div class="logo">
-    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-    CRM
-  </div>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg> CRM</div>
+  <button class="all-tabs">All Tabs &#9662;</button>
   <nav>
-    <a href="#" id="nav-home">Home</a>
-    <a href="#" id="nav-leads">Leads</a>
-    <a href="#" id="nav-contacts" class="active">Contacts</a>
-    <a href="#" id="nav-accounts">Accounts</a>
-    <a href="#" id="nav-deals">Deals</a>
-    <a href="#" id="nav-more">...</a>
+    <a href="#" onclick="showScreen('config')">Home</a>
+    <a href="#" class="active" onclick="showScreen('record')">Leads</a>
+    <a href="#" onclick="showScreen('create')">Contacts</a>
+    <a href="#" onclick="showScreen('config')">Accounts</a>
+    <a href="#" onclick="showScreen('config')">Deals</a>
+    <a href="#">Forecasts</a>
+    <a href="#">...</a>
   </nav>
-  <div class="topbar-right">
-    <button class="icon-btn" title="Search">&#128269;</button>
-    <button class="icon-btn" title="Notifications">&#128276;</button>
-    <button class="icon-btn" title="Settings" onclick="showScreen('config')">&#9881;</button>
-    <div class="avatar">PS</div>
+  <div class="right-icons">
+    <button>+</button><button>&#128269;</button><button>&#128276;</button>
+    <button onclick="showScreen('config')">&#9881;</button>
+    <div class="avatar">KM</div>
   </div>
 </div>
 
-<!-- ===== SIDEBAR ===== -->
-<div class="demo-nav">
+<!-- SIDEBAR -->
+<div class="sidebar">
   <h4>Demo Screens</h4>
-  <a class="nav-item active" onclick="showScreen('config')">1. Configuration Page</a>
-  <a class="nav-item" onclick="showScreen('record')">2. Record Detail Page</a>
-  <a class="nav-item" onclick="showScreen('create-record')">3. Create Record (Upload)</a>
-  <a class="nav-item" onclick="showScreen('dup-found')">4. Duplicates Found</a>
-  <a class="nav-item" onclick="showScreen('no-dup')">5. No Duplicates</a>
-  <a class="nav-item" onclick="showScreen('matching')">6. Matching Records</a>
-  <a class="nav-item" onclick="showScreen('merge')">7. Merge Records</a>
-  <a class="nav-item" onclick="showScreen('unique-subset')">8. Mark Unique Subset</a>
-  <a class="nav-item" onclick="showScreen('permission')">9. Permission Denied</a>
+  <a class="nav-item active" data-screen="config" onclick="showScreen('config')">1. Configuration</a>
+  <a class="nav-item" data-screen="record" onclick="showScreen('record')">2. Record Detail</a>
+  <a class="nav-item" data-screen="create" onclick="showScreen('create')">3. Create / Edit Record</a>
+  <a class="nav-item" data-screen="dup-popup" onclick="showScreen('dup-popup')">4. Duplicates Found</a>
+  <a class="nav-item" data-screen="no-dup" onclick="showScreen('no-dup')">5. No Duplicates</a>
+  <a class="nav-item" data-screen="unique-subset" onclick="showScreen('unique-subset')">6. Mark Unique Subset</a>
+  <a class="nav-item" data-screen="matching" onclick="showScreen('matching')">7. Matching Records</a>
+  <a class="nav-item" data-screen="merge" onclick="showScreen('merge')">8. Merge Records</a>
   <div class="divider"></div>
-  <a class="nav-item" onclick="showScreen('non-facial')">Non-Facial Image Error</a>
+  <a class="nav-item" data-screen="perm" onclick="showScreen('perm')">Permission Denied</a>
+  <a class="nav-item" data-screen="nonfacial" onclick="showScreen('nonfacial')">Non-Facial Error</a>
 </div>
 
-<!-- ===== SCREENS ===== -->
-<div class="page-with-sidebar">
+<div class="main">
 
-<!-- ========== SCREEN 1: CONFIG ========== -->
-<div id="screen-config" class="screen">
-  <div class="page-body">
-    <span class="screen-label">Setup &gt; Zia &gt; Image Deduplication</span>
-    <div class="card">
-      <div class="zia-tabs">
-        <div class="tab">Image Validation</div>
-        <div class="tab">ICR</div>
-        <div class="tab active">Image Deduplication</div>
+<!-- 1. CONFIG -->
+<div id="s-config" class="screen">
+  <span class="screen-label">Setup &gt; Zia &gt; Image Deduplication</span>
+  <div class="card">
+    <div class="zia-tabs">
+      <div class="tab">Image Validation</div>
+      <div class="tab">ICR</div>
+      <div class="tab active">Image Deduplication</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <div>
+        <h2 style="font-size:16px;font-weight:600;margin-bottom:4px">Image Deduplication</h2>
+        <p style="color:#666;font-size:12px;max-width:640px;line-height:1.5">Zia's Deduplication model identifies duplicate records from similar images. On enabling the feature, select the modules for the model to be applied to find duplicates.</p>
       </div>
-      <div class="config-header">
-        <div>
-          <h2 class="card-title">Image Deduplication</h2>
-          <p class="card-desc">Zia's Deduplication model identifies duplicate records from similar images. On enabling the feature, select the modules for the model to be applied to find duplicates.</p>
-        </div>
-        <a href="#" class="help-link">&#128218; Help</a>
+      <a class="help-link">&#128218; Help</a>
+    </div>
+    <div class="note-box"><b>Note:</b> To find potential duplicates with similar images, simply choose the <b>Find Duplicate icon</b> near the uploaded module's record image.</div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn-blue" onclick="openModal('m-add-mod')">Add Module</button>
+    </div>
+    <table class="mod-table">
+      <thead><tr><th>Modules Name</th><th>Created By</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Leads</td><td><div class="created-by"><div class="av">KM</div>Oct 06, 2023</div></td><td><div class="status-wrap"><label class="toggle"><input type="checkbox" checked onchange="confirmDeactivate(this,'Leads')"><span class="sl"></span></label></div></td><td><button class="del-btn" onclick="confirmDel('Leads')">&#128465;</button></td></tr>
+        <tr><td>Contacts</td><td><div class="created-by"><div class="av">KM</div>Oct 06, 2023</div></td><td><div class="status-wrap"><label class="toggle"><input type="checkbox" checked onchange="confirmDeactivate(this,'Contacts')"><span class="sl"></span></label><span class="warn" title="Needs retraining">&#9888;</span></div></td><td><button class="del-btn" onclick="confirmDel('Contacts')">&#128465;</button></td></tr>
+        <tr><td>Accounts</td><td><div class="created-by"><div class="av">KM</div>Oct 06, 2023</div></td><td><div class="status-wrap"><label class="toggle"><input type="checkbox" disabled><span class="sl"></span></label><div class="spinner"></div></div></td><td><button class="del-btn" onclick="confirmDel('Accounts')">&#128465;</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 2. RECORD DETAIL -->
+<div id="s-record" class="screen hidden">
+  <span class="screen-label">Lead Detail &mdash; Christopher Maclead</span>
+  <div class="card">
+    <div class="rec-header">
+      <div class="rec-img-wrap">
+        <img class="rec-img" src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+        <div class="find-dup-btn" onclick="showScreen('dup-popup')"><span style="font-size:11px">&#128269;</span><div class="tip">Find whether the uploaded image has duplicates based on similarity via Zia.</div></div>
       </div>
-      <div class="note-box">
-        <strong>Note:</strong> To find potential duplicates with similar images, simply choose the <strong>Find Duplicate icon</strong> near the uploaded module's record image.
+      <div class="rec-info">
+        <h1>Christopher Maclead</h1>
+        <div class="sub">&#127991; Add Tags</div>
       </div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-        <button class="btn-primary" onclick="openAddModule()" id="addModuleBtn">Add Module</button>
+      <div class="rec-actions">
+        <button class="btn-blue">Send Email</button>
+        <button class="btn-green">Call</button>
+        <button class="btn-outline" onclick="showScreen('create')">Edit</button>
+        <button class="btn-outline">...</button>
       </div>
-      <table class="mod-table">
-        <thead><tr><th>Modules Name</th><th>Created By</th><th>Status</th><th></th></tr></thead>
-        <tbody id="moduleTableBody">
-          <tr>
-            <td>Leads</td>
-            <td><div class="created-by"><div class="av">PS</div>Oct 06, 2023</div></td>
-            <td>
-              <div class="status-icon">
-                <label class="status-toggle"><input type="checkbox" checked onchange="toggleModule(this,'Leads')"><span class="slider"></span></label>
-              </div>
-            </td>
-            <td><button class="delete-btn" onclick="confirmDelete('Leads')">&#128465;</button></td>
-          </tr>
-          <tr>
-            <td>Contacts</td>
-            <td><div class="created-by"><div class="av">PS</div>Oct 06, 2023</div></td>
-            <td>
-              <div class="status-icon">
-                <label class="status-toggle"><input type="checkbox" checked onchange="toggleModule(this,'Contacts')"><span class="slider"></span></label>
-                <span class="warn" title="Model needs retraining">&#9888;</span>
-              </div>
-            </td>
-            <td><button class="delete-btn" onclick="confirmDelete('Contacts')">&#128465;</button></td>
-          </tr>
-          <tr>
-            <td>Accounts</td>
-            <td><div class="created-by"><div class="av">PS</div>Oct 06, 2023</div></td>
-            <td>
-              <div class="status-icon">
-                <label class="status-toggle"><input type="checkbox" disabled><span class="slider"></span></label>
-                <div class="spinner" title="Model creation in progress"></div>
-              </div>
-            </td>
-            <td><button class="delete-btn" onclick="confirmDelete('Accounts')">&#128465;</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <div id="hiddenModulesNote" class="note-box hidden" style="margin-top:16px">
-        <strong>Note:</strong> <span id="hiddenModulesText">2 modules for which image deduplication models created are hidden via organise modules.</span>
-      </div>
+    </div>
+    <div class="detail-tabs">
+      <div class="dt active">Overview</div>
+      <div class="dt">Timeline</div>
+      <div class="dt">Data Privacy</div>
+    </div>
+    <div class="fields-grid">
+      <div class="field-row"><span class="fl">Lead Owner</span><span class="fv">Kiran</span></div>
+      <div class="field-row"><span class="fl">Company</span><span class="fv">Tonal Inc</span></div>
+      <div class="field-row"><span class="fl">First Name</span><span class="fv">Christopher</span></div>
+      <div class="field-row"><span class="fl">Last Name</span><span class="fv">Maclead</span></div>
+      <div class="field-row"><span class="fl">Title</span><span class="fv">COO</span></div>
+      <div class="field-row"><span class="fl">Email</span><span class="fv"><a>christopher-maclead@gmail.com</a></span></div>
+      <div class="field-row"><span class="fl">Phone</span><span class="fv">444-444-444</span></div>
+      <div class="field-row"><span class="fl">Mobile</span><span class="fv">555-555-5555</span></div>
     </div>
   </div>
 </div>
 
-<!-- ========== SCREEN 2: RECORD DETAIL ========== -->
-<div id="screen-record" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">Contact Detail Page</span>
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-        <a href="#" onclick="showScreen('config')" style="font-size:20px;color:#666">&larr;</a>
-      </div>
-      <div class="record-header">
-        <div class="record-img-wrap">
-          <img class="record-img" src="https://api.dicebear.com/7.x/personas/svg?seed=export-test" alt="Record Image">
-          <div class="find-dup-icon" onclick="showScreen('dup-found')" title="Find Duplicate">
-            <span>&#128269;</span>
-            <div class="tooltip">Find whether the uploaded image has duplicates based on similarity via Zia.</div>
-          </div>
-        </div>
-        <div class="record-info">
-          <h1>Export test rec</h1>
-          <div class="tags">&#127991; Add Tags</div>
-        </div>
-        <div class="record-actions">
-          <button class="btn-primary">Send Email</button>
-          <button class="btn-success">Call</button>
-          <button class="btn-outline" onclick="showScreen('create-record')">Edit</button>
-          <button class="btn-outline">...</button>
-        </div>
-      </div>
-      <div class="detail-tabs">
-        <div class="dtab active">Overview</div>
-        <div class="dtab">Timeline</div>
-        <div class="dtab">Data Privacy</div>
-      </div>
-      <div class="record-detail">
-        <div class="field"><span class="label">Date of Birth</span><span class="value">&mdash;</span></div>
-        <div class="field"><span class="label">Email</span><span class="value"><a>appel@india.com</a></span></div>
-        <div class="field"><span class="label">Company</span><span class="value">&mdash;</span></div>
-        <div class="field"><span class="label">Phone</span><span class="value">(984) 008-9424</span></div>
-        <div class="field"><span class="label">Territories</span><span class="value">&mdash;</span></div>
-        <div class="field"><span class="label">Contact Owner</span><span class="value">Kiran</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SCREEN 3: CREATE RECORD ========== -->
-<div id="screen-create-record" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">Create Contact (Image Uploaded)</span>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-        <h2 style="font-size:18px;font-weight:600">Create Contact <span style="font-size:13px;color:#888;font-weight:400">Standard &bull; <a>Edit Page Layout</a></span></h2>
-        <div style="display:flex;gap:10px">
-          <button class="btn-outline">Cancel</button>
-          <button class="btn-outline">Save and New</button>
-          <button class="btn-primary">Save</button>
-        </div>
-      </div>
-      <div style="margin-bottom:20px">
-        <div style="font-weight:600;margin-bottom:10px">Contact Image</div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <div class="record-img-wrap">
-            <img class="record-img" src="https://api.dicebear.com/7.x/personas/svg?seed=christopher" alt="Uploaded Image">
-            <div class="find-dup-icon" onclick="showScreen('dup-found')">
-              <span>&#128269;</span>
-              <div class="tooltip">Find whether the uploaded image has duplicates based on similarity via Zia.</div>
-            </div>
-          </div>
-          <div>
-            <div class="dup-warning">&#9888; Duplicate values are not allowed. Existing contacts with similar image has been found. <a onclick="showScreen('dup-found')">View Duplicate Contact</a></div>
-          </div>
-        </div>
-      </div>
-      <div class="record-detail" style="border-top:1px solid #e8e8e8;padding-top:16px">
-        <div class="field"><span class="label">First Name</span><span class="value"><input value="Christopher" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;width:200px"></span></div>
-        <div class="field"><span class="label">Last Name</span><span class="value"><input value="Maclead" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;width:200px"></span></div>
-        <div class="field"><span class="label">Email</span><span class="value"><input value="christopher-maclead@gmail.com" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;width:200px"></span></div>
-        <div class="field"><span class="label">Phone</span><span class="value"><input value="555-555-5555" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;width:200px"></span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SCREEN 5: NO DUPLICATES ========== -->
-<div id="screen-no-dup" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">No Duplicates Found</span>
-    <div class="banner success">
-      &#9989; Zia found no duplicate for the uploaded image.
-      <button class="close-banner">&times;</button>
-    </div>
-    <div class="card">
-      <div class="record-header">
-        <div class="record-img-wrap">
-          <img class="record-img" src="https://api.dicebear.com/7.x/personas/svg?seed=unique-person" alt="Record Image">
-          <span class="unique-badge" style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);white-space:nowrap">&#10003; Unique</span>
-        </div>
-        <div class="record-info">
-          <h1>Sarah Johnson</h1>
-          <div class="tags">&#127991; Add Tags</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SCREEN 6: MATCHING RECORDS ========== -->
-<div id="screen-matching" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">Matching Records (Select to Merge)</span>
-    <div class="card">
-      <div class="match-header">
-        <h3>Matching Records</h3>
-        <p>Select the duplicate records you'd like to merge. All related records including Attachments, Activities and other related items will be associated with the chosen Master Record. The Master Record selected will retain read only, created by date, and hidden field values.</p>
-      </div>
-      <div class="match-toolbar">
-        <span class="sel-count">3 Records Selected</span>
-        <a class="clear-btn">Clear</a>
-        <button class="btn-primary" onclick="showScreen('merge')">Next</button>
-        <span style="margin-left:auto;color:#888;font-size:13px">1 - 10</span>
-      </div>
-      <table class="match-table">
-        <thead>
-          <tr>
-            <th style="width:40px"></th>
-            <th>Lead Name</th>
-            <th>Company</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Mobile</th>
-            <th>Created Time</th>
-            <th>Modified Time</th>
-            <th>Lead Owner</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="background:#e8f0fe">
-            <td><input type="checkbox" checked></td>
-            <td><strong>Christopher Maclead</strong></td>
-            <td>Rangoni Of Florence</td>
-            <td>christopher-maclead@gmail.com</td>
-            <td>444-444-444</td>
-            <td>555-555-5555</td>
-            <td>Apr 25, 2023 12:39 PM</td>
-            <td>Apr 25, 2023 12:49 PM</td>
-            <td>Kiran</td>
-          </tr>
-          <tr style="background:#e8f0fe">
-            <td><input type="checkbox" checked></td>
-            <td><strong>Christopher Maclead</strong></td>
-            <td>Rangoni Of Florence</td>
-            <td>christopher-maclead@gmail.com</td>
-            <td>555-555-5555</td>
-            <td>555-555-5555</td>
-            <td>Apr 25, 2023 12:39 PM</td>
-            <td>Apr 25, 2023 12:49 PM</td>
-            <td>Kiran</td>
-          </tr>
-          <tr style="background:#e8f0fe">
-            <td><input type="checkbox" checked></td>
-            <td><strong>Christopher Maclead</strong></td>
-            <td>Tonal Inc</td>
-            <td>christopher-maclead@gmail.com</td>
-            <td>555-555-5555</td>
-            <td>555-555-5555</td>
-            <td>Mar 16, 2023 12:08 PM</td>
-            <td>Apr 25, 2023 12:50 PM</td>
-            <td>Kiran</td>
-          </tr>
-          <tr>
-            <td><input type="checkbox"></td>
-            <td>Carissa Kidman (Sample)</td>
-            <td>Oh My Goodknits Inc</td>
-            <td>carissa-kidman@yahoo.com</td>
-            <td>555-555-5555</td>
-            <td>555-555-5555</td>
-            <td>Mar 16, 2023 12:08 PM</td>
-            <td>Mar 16, 2023 12:08 PM</td>
-            <td>Kiran</td>
-          </tr>
-          <tr>
-            <td><input type="checkbox"></td>
-            <td>James Merced (Sample)</td>
-            <td>Kwik Kopy Printing</td>
-            <td>james-merced@gmail.com</td>
-            <td>555-555-5555</td>
-            <td>555-555-5555</td>
-            <td>Mar 16, 2023 12:08 PM</td>
-            <td>Mar 16, 2023 12:08 PM</td>
-            <td>Kiran</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SCREEN 7: MERGE ========== -->
-<div id="screen-merge" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">Deduplicate / Merge Records</span>
-    <div class="card">
-      <div class="merge-topbar">
-        <h2>Deduplicate Leads <span class="info-icon" title="Select fields from records to create a merged master record">&#8505;</span></h2>
-        <div style="display:flex;gap:10px">
-          <button class="btn-outline" onclick="showScreen('matching')">Cancel</button>
-          <button class="btn-primary" onclick="mergeSuccess()">Merge</button>
-        </div>
-      </div>
-      <div class="merge-grid" style="--cols:4">
-        <!-- Header Row -->
-        <div class="cell header field-label"></div>
-        <div class="cell header master-col">Master Record - Record 1</div>
-        <div class="cell header">&#9679; Record 1  <span class="select-all">Select All</span></div>
-        <div class="cell header">&#9675; Record 2  <span class="select-all">Select All</span></div>
-        <div class="cell header">&#9675; Record 3  <span class="select-all">Select All</span></div>
-        <!-- Lead Image -->
-        <div class="cell field-label">Lead Image</div>
-        <div class="cell master-col img-cell"><img src="https://api.dicebear.com/7.x/personas/svg?seed=chris1" alt=""></div>
-        <div class="cell img-cell radio-cell"><input type="radio" name="img" checked><img src="https://api.dicebear.com/7.x/personas/svg?seed=chris1" alt="" style="width:40px;height:40px;border-radius:50%"></div>
-        <div class="cell img-cell radio-cell"><input type="radio" name="img"><img src="https://api.dicebear.com/7.x/personas/svg?seed=chris2" alt="" style="width:40px;height:40px;border-radius:50%"></div>
-        <div class="cell img-cell radio-cell"><input type="radio" name="img"><img src="https://api.dicebear.com/7.x/personas/svg?seed=chris3" alt="" style="width:40px;height:40px;border-radius:50%"></div>
-        <!-- Lead Owner -->
-        <div class="cell field-label">Lead Owner</div>
-        <div class="cell master-col">Kiran</div>
-        <div class="cell">Kiran</div>
-        <div class="cell">Kiran</div>
-        <div class="cell">Kiran</div>
-        <!-- Company -->
-        <div class="cell field-label">Company</div>
-        <div class="cell master-col"><span class="selected-val">Tonal Inc</span></div>
-        <div class="cell radio-cell"><input type="radio" name="company"> Rangoni Of Florence</div>
-        <div class="cell radio-cell"><input type="radio" name="company"> Rangoni Of Florence</div>
-        <div class="cell radio-cell"><input type="radio" name="company" checked> <span class="selected-val">Tonal Inc</span></div>
-        <!-- First Name -->
-        <div class="cell field-label">First Name</div>
-        <div class="cell master-col">Christopher</div>
-        <div class="cell">Christopher</div>
-        <div class="cell">Christopher</div>
-        <div class="cell">Christopher</div>
-        <!-- Last Name -->
-        <div class="cell field-label">Last Name</div>
-        <div class="cell master-col">Maclead</div>
-        <div class="cell">Maclead</div>
-        <div class="cell">Maclead</div>
-        <div class="cell">Maclead</div>
-        <!-- Title -->
-        <div class="cell field-label">Title</div>
-        <div class="cell master-col"><span class="selected-val">COO</span></div>
-        <div class="cell radio-cell"><input type="radio" name="title"> VP Accounting</div>
-        <div class="cell radio-cell"><input type="radio" name="title" checked> <span class="selected-val">COO</span></div>
-        <div class="cell radio-cell"><input type="radio" name="title"> VP Accounting</div>
-        <!-- Email -->
-        <div class="cell field-label">Email</div>
-        <div class="cell master-col">christopher-maclead@gmail.com</div>
-        <div class="cell">christopher-maclead@gmail.com</div>
-        <div class="cell">christopher-maclead@gmail.com</div>
-        <div class="cell">christopher-maclead@gmail.com</div>
-        <!-- Phone -->
-        <div class="cell field-label">Phone</div>
-        <div class="cell master-col"><span class="selected-val">444-444-444</span></div>
-        <div class="cell radio-cell"><input type="radio" name="phone" checked> <span class="selected-val">444-444-444</span></div>
-        <div class="cell radio-cell"><input type="radio" name="phone"></div>
-        <div class="cell radio-cell"><input type="radio" name="phone"> 555-555-5555</div>
-        <!-- Mobile -->
-        <div class="cell field-label">Mobile</div>
-        <div class="cell master-col">555-555-5555</div>
-        <div class="cell">555-555-5555</div>
-        <div class="cell">555-555-5555</div>
-        <div class="cell">555-555-5555</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SCREEN 8: UNIQUE SUBSET ========== -->
-<div id="screen-unique-subset" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">Mark Unique Subset</span>
-    <div class="card">
-      <div class="modal-header" style="padding:0 0 16px">
-        <h3>Duplicates image found</h3>
-      </div>
-      <div class="dup-info-box">
-        <img class="dup-avatar" src="https://api.dicebear.com/7.x/personas/svg?seed=input-image" alt="">
-        <div>
-          <div class="dup-text">Zia has identified the uploaded image as a duplicate, kindly check the box to indicate if it is not a duplicate.</div>
-          <div class="dup-note">Note: On record save only this update will reflect.</div>
-        </div>
-      </div>
-      <div class="mark-unique-wrap" style="margin-bottom:4px">
-        <label><input type="checkbox" id="markAllUnique" onchange="toggleAllUnique()"> <strong>Mark ALL as not a Duplicate</strong> (marks input unique vs all below)</label>
-      </div>
-      <p style="font-size:12px;color:#888;margin-bottom:16px">Or select individual records to mark as unique relative to the input image:</p>
-
-      <div class="dup-section-title">Select Records to Mark as Unique <span class="count" id="uniqueSelCount">0 selected</span></div>
-      <div class="dup-list" id="uniqueSubsetList">
-        <div class="dup-item">
-          <input type="checkbox" class="unique-cb" onchange="updateUniqueCount()">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=airtel" alt="">
-          <div class="dup-item-info"><div class="name">Airtel Pvt ltd Flash Screen</div><div class="email">airtel@gmail.com</div></div>
-        </div>
-        <div class="dup-item">
-          <input type="checkbox" class="unique-cb" onchange="updateUniqueCount()">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=hdfc" alt="">
-          <div class="dup-item-info"><div class="name">Hdfc Pvt Ltd</div><div class="email">hdfccon@gmail.com</div></div>
-        </div>
-        <div class="dup-item">
-          <input type="checkbox" class="unique-cb" onchange="updateUniqueCount()">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=lic" alt="">
-          <div class="dup-item-info"><div class="name">Lic Corporation</div><div class="email">lic@gmail.com</div></div>
-        </div>
-        <div class="dup-item">
-          <input type="checkbox" class="unique-cb" onchange="updateUniqueCount()">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=bsnl" alt="">
-          <div class="dup-item-info"><div class="name">Bsnl Pvt Ltd</div><div class="email">bsnlindia@gmail.com</div></div>
-        </div>
-        <div class="dup-item">
-          <input type="checkbox" class="unique-cb" onchange="updateUniqueCount()">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=johannes" alt="">
-          <div class="dup-item-info"><div class="name">Johannes Kepler</div><div class="email">kepler.john@gmail.com</div></div>
-        </div>
-      </div>
-      <div style="margin-top:8px;padding:10px;background:#f0f7ff;border-radius:6px;font-size:12px;color:#555">
-        <strong>How it works:</strong><br>
-        &bull; <strong>Mark ALL:</strong> The input image is considered unique against all listed records. None of them will show input image as duplicate.<br>
-        &bull; <strong>Select subset:</strong> Only chosen records treat input image as unique. Un-selected records can still show input image as a potential duplicate and vice versa.
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+<!-- 3. CREATE / EDIT -->
+<div id="s-create" class="screen hidden">
+  <span class="screen-label">Create Contact &mdash; Image Uploaded</span>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="font-size:16px;font-weight:600">Create Contact <span style="font-size:12px;color:#888;font-weight:400">Standard &#9662; &nbsp;<a>Edit Page Layout</a></span></h2>
+      <div style="display:flex;gap:8px">
         <button class="btn-outline">Cancel</button>
-        <button class="btn-danger">Upload New Image</button>
-        <button class="btn-primary" onclick="applyUniqueSubset()">Update</button>
+        <button class="btn-outline">zdv &#9662;</button>
+        <button class="btn-outline">Save and New</button>
+        <button class="btn-blue">Save</button>
+      </div>
+    </div>
+    <div style="font-weight:600;font-size:13px;margin-bottom:8px">Contact Image</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+      <div class="rec-img-wrap">
+        <img class="rec-img" src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+        <div class="find-dup-btn" onclick="showScreen('dup-popup')"><span style="font-size:11px">&#128269;</span><div class="tip">Find duplicates via Zia</div></div>
+      </div>
+      <div>
+        <div class="dup-warning">&#9888; Duplicate values are not allowed. Existing contacts with similar image has been found. <a onclick="showScreen('dup-popup')">View Duplicate Contact</a></div>
+      </div>
+    </div>
+    <div class="fields-grid" style="border-top:1px solid #e8e8e8;padding-top:12px">
+      <div class="field-row"><span class="fl">First Name</span><span class="fv"><input value="Christopher" style="padding:5px 8px;border:1px solid #ddd;border-radius:3px;width:180px"></span></div>
+      <div class="field-row"><span class="fl">Last Name</span><span class="fv"><input value="Maclead" style="padding:5px 8px;border:1px solid #ddd;border-radius:3px;width:180px"></span></div>
+      <div class="field-row"><span class="fl">Company</span><span class="fv"><input value="Tonal Inc" style="padding:5px 8px;border:1px solid #ddd;border-radius:3px;width:180px"></span></div>
+      <div class="field-row"><span class="fl">Email</span><span class="fv"><input value="christopher-maclead@gmail.com" style="padding:5px 8px;border:1px solid #ddd;border-radius:3px;width:220px"></span></div>
+      <div class="field-row"><span class="fl">Phone</span><span class="fv"><input value="444-444-444" style="padding:5px 8px;border:1px solid #ddd;border-radius:3px;width:180px"></span></div>
+      <div class="field-row"><span class="fl">Mobile</span><span class="fv"><input value="555-555-5555" style="padding:5px 8px;border:1px solid #ddd;border-radius:3px;width:180px"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. DUPLICATES FOUND -->
+<div id="s-dup-popup" class="screen hidden">
+  <span class="screen-label">Duplicates Found &mdash; Select to Merge or Mark Unique</span>
+  <div class="card" style="max-width:640px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-size:16px;font-weight:600">Duplicates image found</h3>
+      <button class="m-close" onclick="showScreen('record')">&times;</button>
+    </div>
+    <div class="dup-info">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+      <div>
+        <div class="txt">Zia has identified the uploaded image as a duplicate, kindly check the box to indicate if it is not a duplicate.</div>
+        <div class="note-italic">Note- On record save only this update will reflect.</div>
+      </div>
+    </div>
+    <div class="mark-row"><label><input type="checkbox" id="markNotDup" onchange="handleMarkAll()"> Mark as not a Duplicate</label></div>
+
+    <div class="dup-title">Duplicate Contact <span class="cnt" id="dupCount">4</span></div>
+
+    <div class="dup-list" id="dupList">
+      <div class="dup-item">
+        <input type="checkbox" class="cb dup-sel" onchange="updateDupSel()">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+        <div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Rangoni Of Florence</div></div>
+        <div class="actions"><a class="merge-link" onclick="goMergeOne(0)">Merge &#8594;</a></div>
+      </div>
+      <div class="dup-item">
+        <input type="checkbox" class="cb dup-sel" onchange="updateDupSel()">
+        <img src="https://randomuser.me/api/portraits/men/33.jpg" alt="">
+        <div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Rangoni Of Florence</div></div>
+        <div class="actions"><a class="merge-link" onclick="goMergeOne(1)">Merge &#8594;</a></div>
+      </div>
+      <div class="dup-item">
+        <input type="checkbox" class="cb dup-sel" onchange="updateDupSel()">
+        <img src="https://randomuser.me/api/portraits/men/34.jpg" alt="">
+        <div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Tonal Inc</div></div>
+        <div class="actions"><a class="merge-link" onclick="goMergeOne(2)">Merge &#8594;</a></div>
+      </div>
+      <div class="dup-item">
+        <input type="checkbox" class="cb dup-sel" onchange="updateDupSel()">
+        <img src="https://randomuser.me/api/portraits/men/35.jpg" alt="">
+        <div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Tonal Inc</div></div>
+        <div class="actions"><a class="merge-link" onclick="goMergeOne(3)">Merge &#8594;</a></div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:12px;color:#555" id="dupSelInfo">Select records to merge or mark unique</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-outline" onclick="showScreen('record')">Cancel</button>
+        <button class="btn-red">Upload New Image</button>
+        <button class="btn-blue" id="btnMergeSel" disabled onclick="goMergeSelected()">Merge Selected</button>
+        <button class="btn-outline" id="btnUniSel" disabled onclick="goUniqueSelected()">Mark Unique</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ========== SCREEN 9: PERMISSION DENIED ========== -->
-<div id="screen-permission" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">Permission Denied Case</span>
-    <div class="card">
-      <div class="modal-header" style="padding:0 0 16px">
-        <h3>Duplicates found</h3>
+<!-- 5. NO DUPLICATES -->
+<div id="s-no-dup" class="screen hidden">
+  <span class="screen-label">No Duplicates Found</span>
+  <div class="banner ok">&#9989; Zia found no duplicate for the uploaded image.<button class="bx" onclick="this.parentElement.style.display='none'">&times;</button></div>
+  <div class="card">
+    <div class="rec-header">
+      <div class="rec-img-wrap">
+        <img class="rec-img" src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+        <span class="unique-badge" style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);white-space:nowrap">&#10003; Unique</span>
       </div>
-      <div class="dup-info-box">
-        <img class="dup-avatar" src="https://api.dicebear.com/7.x/personas/svg?seed=denied-user" alt="">
-        <div class="dup-text">Zia has identified the uploaded image as a duplicate, kindly check the box to indicate if it is not a duplicate.</div>
-      </div>
-      <div class="mark-unique-wrap">
-        <label><input type="checkbox"> Mark as not a Duplicate</label>
-      </div>
-      <div class="dup-section-title">Similar Contact(s)</div>
-      <div class="perm-note">
-        <strong>Note -</strong> Access to view the samples are denied as you don't have permissions. Kindly check your permission to view.
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
-        <button class="btn-outline">Cancel</button>
-        <button class="btn-danger">Upload New Image</button>
-        <button class="btn-primary">Update</button>
-      </div>
+      <div class="rec-info"><h1>Christopher Maclead</h1><div class="sub">Tonal Inc &bull; COO &bull; christopher-maclead@gmail.com</div></div>
     </div>
   </div>
 </div>
 
-<!-- ========== SCREEN: NON-FACIAL ========== -->
-<div id="screen-non-facial" class="screen hidden">
-  <div class="page-body">
-    <span class="screen-label">Non-Facial Image Error</span>
-    <div class="banner error">
-      &#10060; Zia cannot find duplicate for the uploaded image as it's a non-facial image.
-      <button class="close-banner">&times;</button>
-    </div>
-    <div class="card">
-      <div class="record-header">
-        <div class="record-img-wrap">
-          <img class="record-img" src="https://api.dicebear.com/7.x/shapes/svg?seed=building" alt="Non-facial image">
-        </div>
-        <div class="record-info">
-          <h1>Acme Corp Building</h1>
-          <div class="tags">&#127991; Add Tags</div>
-        </div>
+<!-- 6. UNIQUE SUBSET -->
+<div id="s-unique-subset" class="screen hidden">
+  <span class="screen-label">Mark Unique &mdash; Select Records</span>
+  <div class="card" style="max-width:640px">
+    <h3 style="font-size:16px;font-weight:600;margin-bottom:14px">Mark as Unique</h3>
+    <div class="dup-info">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+      <div>
+        <div class="txt">Select records that should be treated as <b>unique</b> relative to this input image. Once marked, these records will no longer show this image as a duplicate, and vice versa.</div>
+        <div class="note-italic">Note- On record save only this update will reflect.</div>
       </div>
     </div>
-  </div>
-</div>
+    <div class="mark-row" style="margin:10px 0 4px"><label><input type="checkbox" id="markAllUniq" onchange="toggleAllUniq()"> <b>Mark ALL as Unique</b> (input image is unique vs all records below)</label></div>
+    <p style="font-size:11px;color:#888;margin-bottom:12px">Or select individual records:</p>
 
-</div><!-- end page-with-sidebar -->
+    <div class="dup-title">Records <span class="cnt" id="uniqCount">0 / 4 selected</span></div>
+    <div class="dup-list" id="uniqList">
+      <div class="dup-item"><input type="checkbox" class="cb uniq-cb" onchange="updateUniqCount()"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt=""><div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Rangoni Of Florence</div></div></div>
+      <div class="dup-item"><input type="checkbox" class="cb uniq-cb" onchange="updateUniqCount()"><img src="https://randomuser.me/api/portraits/men/33.jpg" alt=""><div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Rangoni Of Florence</div></div></div>
+      <div class="dup-item"><input type="checkbox" class="cb uniq-cb" onchange="updateUniqCount()"><img src="https://randomuser.me/api/portraits/men/34.jpg" alt=""><div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Tonal Inc</div></div></div>
+      <div class="dup-item"><input type="checkbox" class="cb uniq-cb" onchange="updateUniqCount()"><img src="https://randomuser.me/api/portraits/men/35.jpg" alt=""><div class="info"><div class="nm">Christopher Maclead</div><div class="em">christopher-maclead@gmail.com &bull; Tonal Inc</div></div></div>
+    </div>
 
-<!-- ========== MODAL: DUPLICATES FOUND (overlay) ========== -->
-<div id="modal-dup-found" class="modal-overlay hidden">
-  <div class="modal dup-modal">
-    <div class="modal-header">
-      <h3>Duplicates image found</h3>
-      <button class="modal-close" onclick="closeModal('modal-dup-found')">&times;</button>
+    <div style="background:#f0f7ff;border-radius:4px;padding:10px 12px;margin-top:10px;font-size:11px;color:#555;line-height:1.6">
+      <b>How it works:</b><br>
+      &bull; <b>Mark ALL:</b> Input image is unique vs all listed records. None will show input as duplicate.<br>
+      &bull; <b>Select subset:</b> Only chosen records treat input as unique. Un-selected records can still show the input image as a potential duplicate and vice versa.<br>
+      &bull; Once marked unique, those duplicate entries are <b>permanently removed</b> from future searches for this image pair.
     </div>
-    <div class="modal-body">
-      <div class="dup-info-box">
-        <img class="dup-avatar" src="https://api.dicebear.com/7.x/personas/svg?seed=christopher" alt="">
-        <div>
-          <div class="dup-text">Zia has identified the uploaded image as a duplicate, kindly check the box to indicate if it is not a duplicate.</div>
-          <div class="dup-note">Note- On record save only this update will reflect.</div>
-        </div>
-      </div>
-      <div class="mark-unique-wrap">
-        <label><input type="checkbox" id="modalMarkUnique"> Mark as not a Duplicate</label>
-      </div>
-      <div class="dup-section-title">Duplicate Contact <span class="count">4</span></div>
-      <div class="dup-list">
-        <div class="dup-item">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=airtel" alt="">
-          <div class="dup-item-info"><div class="name">Airtel Pvt ltd Flash Screen</div><div class="email">airtel@gmail.com</div></div>
-          <div class="dup-item-actions">
-            <a class="merge-link" onclick="closeModal('modal-dup-found');showScreen('matching')">Merge &rarr;</a>
-          </div>
-        </div>
-        <div class="dup-item">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=hdfc" alt="">
-          <div class="dup-item-info"><div class="name">Hdfc Pvt Ltd</div><div class="email">hdfccon@gmail.com</div></div>
-          <div class="dup-item-actions">
-            <a class="merge-link" onclick="closeModal('modal-dup-found');showScreen('matching')">Merge &rarr;</a>
-          </div>
-        </div>
-        <div class="dup-item">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=lic" alt="">
-          <div class="dup-item-info"><div class="name">Lic Corporation</div><div class="email">lic@gmail.com</div></div>
-          <div class="dup-item-actions">
-            <a class="merge-link" onclick="closeModal('modal-dup-found');showScreen('matching')">Merge &rarr;</a>
-          </div>
-        </div>
-        <div class="dup-item">
-          <img class="dup-item-img" src="https://api.dicebear.com/7.x/personas/svg?seed=bsnl" alt="">
-          <div class="dup-item-info"><div class="name">Bsnl Pvt Ltd</div><div class="email">bsnlindia@gmail.com</div></div>
-          <div class="dup-item-actions">
-            <a class="merge-link" onclick="closeModal('modal-dup-found');showScreen('matching')">Merge &rarr;</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-outline" onclick="closeModal('modal-dup-found')">Cancel</button>
-      <button class="btn-danger">Upload New Image</button>
-      <button class="btn-primary" onclick="closeModal('modal-dup-found');showScreen('unique-subset')">Mark Unique / Update</button>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+      <button class="btn-outline" onclick="showScreen('dup-popup')">Cancel</button>
+      <button class="btn-blue" onclick="applyUniq()">Update</button>
     </div>
   </div>
 </div>
 
-<!-- ========== MODAL: ADD MODULE ========== -->
-<div id="modal-add-module" class="modal-overlay hidden">
-  <div class="modal" style="max-width:460px">
-    <div class="modal-header"><h3>Select Module</h3><button class="modal-close" onclick="closeModal('modal-add-module')">&times;</button></div>
-    <div class="modal-body">
-      <p style="color:#666;font-size:13px;margin-bottom:16px">Select a Module for which you would like to find duplicate</p>
-      <div class="form-group">
-        <label>Modules</label>
-        <select id="moduleSelect">
-          <option value="">Select</option>
-          <option value="Leads">Leads</option>
-          <option value="Contacts">Contacts</option>
-          <option value="Accounts">Accounts</option>
-          <option value="Deals">Deals</option>
-          <option value="Vendors">Vendors</option>
-        </select>
-      </div>
+<!-- 7. MATCHING RECORDS -->
+<div id="s-matching" class="screen hidden">
+  <span class="screen-label">Matching Records &mdash; Select for Merge</span>
+  <div class="card">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:4px">Matching Records</h3>
+    <p style="font-size:11px;color:#666;line-height:1.5;margin-bottom:14px;max-width:900px">Select the duplicate records you'd like to merge. All related records including Attachments, Activities and other related items will be associated with the chosen Master Record. The Master Record selected will retain read only, created by date, and hidden field values.</p>
+    <div class="match-bar">
+      <span class="sel" id="matchSelCount">3 Records Selected</span>
+      <a class="clr" onclick="clearMatchSel()">Clear</a>
+      <button class="btn-blue" onclick="showScreen('merge')">Next</button>
+      <span style="margin-left:auto;font-size:12px;color:#888">1 - 10</span>
     </div>
-    <div class="modal-footer">
-      <button class="btn-outline" onclick="closeModal('modal-add-module')">Cancel</button>
-      <button class="btn-primary" onclick="addModule()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ========== MODAL: DELETE CONFIRM ========== -->
-<div id="modal-delete" class="modal-overlay hidden">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header"><h3>Are you sure you would want to Delete?</h3><button class="modal-close" onclick="closeModal('modal-delete')">&times;</button></div>
-    <div class="modal-body">
-      <p id="deleteMsg" style="color:#555;font-size:14px">The deduplication model for <strong>Leads</strong> will be removed and no more duplicates can be found based on similar images.</p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-outline" onclick="closeModal('modal-delete')">Cancel</button>
-      <button class="btn-danger" onclick="closeModal('modal-delete')">Yes, Delete</button>
+    <div style="overflow-x:auto">
+    <table class="m-table">
+      <thead><tr><th></th><th>Lead Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Mobile</th><th>Created Time</th><th>Modified Time</th><th>Lead Owner</th></tr></thead>
+      <tbody>
+        <tr class="selected"><td><input type="checkbox" checked class="match-cb" onchange="updateMatchCount()"></td><td><b>Christopher Maclead</b></td><td>Rangoni Of Florence</td><td>christopher-maclead@gmail.com</td><td>444-444-444</td><td>555-555-5555</td><td>Apr 25, 2023 12:39 PM</td><td>Apr 25, 2023 12:49 PM</td><td>Kiran</td></tr>
+        <tr class="selected"><td><input type="checkbox" checked class="match-cb" onchange="updateMatchCount()"></td><td><b>Christopher Maclead</b></td><td>Rangoni Of Florence</td><td>christopher-maclead@gmail.com</td><td>555-555-5555</td><td>555-555-5555</td><td>Apr 25, 2023 12:39 PM</td><td>Apr 25, 2023 12:49 PM</td><td>Kiran</td></tr>
+        <tr class="selected"><td><input type="checkbox" checked class="match-cb" onchange="updateMatchCount()"></td><td><b>Christopher Maclead</b></td><td>Tonal Inc</td><td>christopher-maclead@gmail.com</td><td>555-555-5555</td><td>555-555-5555</td><td>Mar 16, 2023 12:08 PM</td><td>Apr 25, 2023 12:50 PM</td><td>Kiran</td></tr>
+        <tr><td><input type="checkbox" class="match-cb" onchange="updateMatchCount()"></td><td>Carissa Kidman (Sample)</td><td>Oh My Goodknits Inc</td><td>carissa-kidman@yahoo.com</td><td>555-555-5555</td><td>555-555-5555</td><td>Mar 16, 2023 12:08 PM</td><td>Mar 16, 2023 12:08 PM</td><td>Kiran</td></tr>
+        <tr><td><input type="checkbox" class="match-cb" onchange="updateMatchCount()"></td><td>James Merced (Sample)</td><td>Kwik Kopy Printing</td><td>james-merced@gmail.com</td><td>555-555-5555</td><td>555-555-5555</td><td>Mar 16, 2023 12:08 PM</td><td>Mar 16, 2023 12:08 PM</td><td>Kiran</td></tr>
+      </tbody>
+    </table>
     </div>
   </div>
 </div>
 
-<!-- ========== MODAL: DEACTIVATE CONFIRM ========== -->
-<div id="modal-deactivate" class="modal-overlay hidden">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-header"><h3>Are you sure you want to deactivate?</h3><button class="modal-close" onclick="closeModal('modal-deactivate')">&times;</button></div>
-    <div class="modal-body">
-      <p id="deactivateMsg" style="color:#555;font-size:14px">The image deduplication model will no longer receive new images for training, and upon deactivation, it won't identify duplicates for the module's record images.</p>
+<!-- 8. MERGE -->
+<div id="s-merge" class="screen hidden">
+  <span class="screen-label">Deduplicate / Merge Leads</span>
+  <div class="card">
+    <div class="merge-top">
+      <h2>Deduplicate Leads <span class="info-i" title="Choose field values from each record to build the merged master">&#8505;</span></h2>
+      <div style="display:flex;gap:8px"><button class="btn-outline" onclick="showScreen('matching')">Cancel</button><button class="btn-blue" onclick="doMerge()">Merge</button></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-outline" onclick="closeModal('modal-deactivate')">Cancel</button>
-      <button class="btn-danger" onclick="closeModal('modal-deactivate')">Yes, Deactivate</button>
+    <div style="overflow-x:auto">
+    <div class="mg" style="grid-template-columns:160px repeat(4,1fr)">
+      <div class="c hdr lbl"></div>
+      <div class="c hdr master master-border master-top" style="font-weight:700">Master Record - Record 1</div>
+      <div class="c hdr">&#9679; Record 1 <span class="sel-all">Select All</span></div>
+      <div class="c hdr">&#9675; Record 2 <span class="sel-all">Select All</span></div>
+      <div class="c hdr">&#9675; Record 3 <span class="sel-all">Select All</span></div>
+
+      <div class="c lbl">Lead Image</div>
+      <div class="c master master-border img-c"><img src="https://randomuser.me/api/portraits/men/32.jpg"></div>
+      <div class="c img-c"><input type="radio" name="r_img" checked><img src="https://randomuser.me/api/portraits/men/32.jpg" style="width:40px;height:40px;border-radius:50%"></div>
+      <div class="c img-c"><input type="radio" name="r_img"><img src="https://randomuser.me/api/portraits/men/33.jpg" style="width:40px;height:40px;border-radius:50%"></div>
+      <div class="c img-c"><input type="radio" name="r_img"><img src="https://randomuser.me/api/portraits/men/34.jpg" style="width:40px;height:40px;border-radius:50%"></div>
+
+      <div class="c lbl">Lead Owner</div>
+      <div class="c master master-border">Kiran</div>
+      <div class="c">Kiran</div><div class="c">Kiran</div><div class="c">Kiran</div>
+
+      <div class="c lbl">Company</div>
+      <div class="c master master-border"><span class="sel-val">Tonal Inc</span></div>
+      <div class="c"><input type="radio" name="r_co"> Rangoni Of Florence</div>
+      <div class="c"><input type="radio" name="r_co"> Rangoni Of Florence</div>
+      <div class="c"><input type="radio" name="r_co" checked> <span class="sel-val">Tonal Inc</span></div>
+
+      <div class="c lbl">First Name</div>
+      <div class="c master master-border">Christopher</div>
+      <div class="c">Christopher</div><div class="c">Christopher</div><div class="c">Christopher</div>
+
+      <div class="c lbl">Last Name</div>
+      <div class="c master master-border">Maclead</div>
+      <div class="c">Maclead</div><div class="c">Maclead</div><div class="c">Maclead</div>
+
+      <div class="c lbl">Title</div>
+      <div class="c master master-border"><span class="sel-val">COO</span></div>
+      <div class="c"><input type="radio" name="r_ti"> VP Accounting</div>
+      <div class="c"><input type="radio" name="r_ti" checked> <span class="sel-val">COO</span></div>
+      <div class="c"><input type="radio" name="r_ti"> VP Accounting</div>
+
+      <div class="c lbl">Email</div>
+      <div class="c master master-border">christopher-maclead@gmail.com</div>
+      <div class="c" style="font-size:11px">christopher-maclead@gmail.com</div><div class="c" style="font-size:11px">christopher-maclead@gmail.com</div><div class="c" style="font-size:11px">christopher-maclead@gmail.com</div>
+
+      <div class="c lbl">Phone</div>
+      <div class="c master master-border"><span class="sel-val">444-444-444</span></div>
+      <div class="c"><input type="radio" name="r_ph" checked> <span class="sel-val">444-444-444</span></div>
+      <div class="c"><input type="radio" name="r_ph"></div>
+      <div class="c"><input type="radio" name="r_ph"> 555-555-5555</div>
+
+      <div class="c lbl">Fax</div>
+      <div class="c master master-border">&mdash;</div>
+      <div class="c">&mdash;</div><div class="c">&mdash;</div><div class="c">&mdash;</div>
+
+      <div class="c lbl">Mobile</div>
+      <div class="c master master-border master-bot">555-555-5555</div>
+      <div class="c">555-555-5555</div><div class="c">555-555-5555</div><div class="c">555-555-5555</div>
+    </div>
     </div>
   </div>
 </div>
 
-<!-- ========== MODAL: MERGE SUCCESS ========== -->
-<div id="modal-merge-success" class="modal-overlay hidden">
-  <div class="modal" style="max-width:420px;text-align:center;padding:40px 30px">
-    <div style="font-size:48px;margin-bottom:12px">&#9989;</div>
-    <h3 style="margin-bottom:8px">Records Merged Successfully</h3>
-    <p style="color:#666;font-size:14px;margin-bottom:20px">The duplicate records have been merged into the master record.</p>
-    <button class="btn-primary" onclick="closeModal('modal-merge-success');showScreen('record')">View Record</button>
+<!-- PERMISSION -->
+<div id="s-perm" class="screen hidden">
+  <span class="screen-label">Permission Denied Case</span>
+  <div class="card" style="max-width:640px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-size:16px;font-weight:600">Duplicates found</h3>
+      <button class="m-close" onclick="showScreen('record')">&times;</button>
+    </div>
+    <div class="dup-info">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+      <div class="txt">Zia has identified the uploaded image as a duplicate, kindly check the box to indicate if it is not a duplicate.</div>
+    </div>
+    <div class="mark-row"><label><input type="checkbox"> Mark as not a Duplicate</label></div>
+    <div class="dup-title">Similar Contact(s)</div>
+    <div class="perm-note"><b>Note -</b> Access to view the samples are denied as you don't have permissions. Kindly check your permission to view.</div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+      <button class="btn-outline">Cancel</button><button class="btn-red">Upload New Image</button><button class="btn-blue">Update</button>
+    </div>
   </div>
 </div>
 
-<!-- ========== MODAL: UNIQUE APPLIED ========== -->
-<div id="modal-unique-applied" class="modal-overlay hidden">
-  <div class="modal" style="max-width:420px;text-align:center;padding:40px 30px">
-    <div style="font-size:48px;margin-bottom:12px">&#10003;</div>
-    <h3 style="margin-bottom:8px">Unique Marking Applied</h3>
-    <p style="color:#666;font-size:14px;margin-bottom:6px">Selected records are now marked as unique relative to the input image.</p>
-    <p style="color:#888;font-size:12px;margin-bottom:20px">This will reflect once the record is saved.</p>
-    <button class="btn-primary" onclick="closeModal('modal-unique-applied')">OK</button>
+<!-- NON-FACIAL -->
+<div id="s-nonfacial" class="screen hidden">
+  <span class="screen-label">Non-Facial Image Error</span>
+  <div class="banner err">&#10060; Zia cannot find duplicate for the uploaded image as it's a non-facial image.<button class="bx" onclick="this.parentElement.style.display='none'">&times;</button></div>
+  <div class="card">
+    <div class="rec-header">
+      <div class="rec-img-wrap"><img class="rec-img" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&h=100&fit=crop" alt=""></div>
+      <div class="rec-info"><h1>Acme Corp Building</h1><div class="sub">Non-facial image upload</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- MODALS -->
+<div id="m-add-mod" class="overlay hidden">
+  <div class="modal modal-sm">
+    <div class="m-head"><h3>Select Module</h3><button class="m-close" onclick="closeModal('m-add-mod')">&times;</button></div>
+    <div class="m-body">
+      <p style="color:#666;font-size:12px;margin-bottom:12px">Select a Module for which you would like to find duplicate</p>
+      <label style="display:block;font-weight:500;font-size:12px;color:#555;margin-bottom:4px">Modules</label>
+      <select id="modSel" style="width:100%;padding:8px 10px;border:1px solid #d0d5dd;border-radius:4px"><option value="">Select</option><option>Leads</option><option>Contacts</option><option>Accounts</option><option>Deals</option><option>Vendors</option></select>
+    </div>
+    <div class="m-foot"><button class="btn-outline" onclick="closeModal('m-add-mod')">Cancel</button><button class="btn-blue" onclick="closeModal('m-add-mod')">Save</button></div>
+  </div>
+</div>
+
+<div id="m-del" class="overlay hidden">
+  <div class="modal modal-sm">
+    <div class="m-head"><h3>Are you sure you would want to Delete?</h3><button class="m-close" onclick="closeModal('m-del')">&times;</button></div>
+    <div class="m-body"><p id="delMsg" style="font-size:13px;color:#555"></p></div>
+    <div class="m-foot"><button class="btn-outline" onclick="closeModal('m-del')">Cancel</button><button class="btn-red" onclick="closeModal('m-del')">Yes, Delete</button></div>
+  </div>
+</div>
+
+<div id="m-deact" class="overlay hidden">
+  <div class="modal modal-sm">
+    <div class="m-head"><h3>Are you sure you want to deactivate?</h3><button class="m-close" onclick="closeModal('m-deact')">&times;</button></div>
+    <div class="m-body"><p style="font-size:13px;color:#555">The image deduplication model will no longer receive new images for training, and upon deactivation, it won't identify duplicates for the module's record images.</p></div>
+    <div class="m-foot"><button class="btn-outline" onclick="closeModal('m-deact')">Cancel</button><button class="btn-red" onclick="closeModal('m-deact')">Yes, Deactivate</button></div>
+  </div>
+</div>
+
+<div id="m-merge-ok" class="overlay hidden">
+  <div class="modal modal-sm" style="text-align:center;padding:36px 24px">
+    <div style="font-size:44px;margin-bottom:10px">&#9989;</div>
+    <h3 style="margin-bottom:6px">Records Merged Successfully</h3>
+    <p style="color:#666;font-size:13px;margin-bottom:18px">The duplicate records for Christopher Maclead have been merged into the master record.</p>
+    <button class="btn-blue" onclick="closeModal('m-merge-ok');showScreen('record')">View Record</button>
+  </div>
+</div>
+
+<div id="m-uniq-ok" class="overlay hidden">
+  <div class="modal modal-sm" style="text-align:center;padding:36px 24px">
+    <div style="font-size:44px;margin-bottom:10px;color:#28a745">&#10003;</div>
+    <h3 style="margin-bottom:6px">Unique Marking Applied</h3>
+    <p style="color:#666;font-size:13px;margin-bottom:4px">Selected records are now marked as unique relative to Christopher Maclead's input image.</p>
+    <p style="color:#888;font-size:11px;margin-bottom:18px">These duplicates will no longer appear in future searches. This reflects on record save.</p>
+    <button class="btn-blue" onclick="closeModal('m-uniq-ok');showScreen('no-dup')">OK</button>
   </div>
 </div>
 
 <script>
-// ===== NAVIGATION =====
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  const screen = document.getElementById('screen-' + id);
-  if (screen) screen.classList.remove('hidden');
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  var el=document.getElementById('s-'+id);
+  if(el)el.classList.remove('hidden');
+  document.querySelectorAll('.sidebar .nav-item').forEach(n=>{
+    n.classList.toggle('active',n.dataset.screen===id);
+  });
+  window.scrollTo(0,0);
+}
+function openModal(id){document.getElementById(id).classList.remove('hidden')}
+function closeModal(id){document.getElementById(id).classList.add('hidden')}
+document.querySelectorAll('.overlay').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.add('hidden')})});
 
-  // For dup-found, show modal overlay instead
-  if (id === 'dup-found') {
-    document.getElementById('screen-config').classList.remove('hidden'); // show bg
-    openModal('modal-dup-found');
-    return;
-  }
+function confirmDel(m){
+  document.getElementById('delMsg').innerHTML='The deduplication model for <b>'+m+'</b> will be removed and no more duplicates can be found based on similar images.';
+  openModal('m-del');
+}
+function confirmDeactivate(cb){if(!cb.checked){cb.checked=true;openModal('m-deact')}}
 
-  // Update sidebar
-  document.querySelectorAll('.demo-nav .nav-item').forEach(n => n.classList.remove('active'));
-  const items = document.querySelectorAll('.demo-nav .nav-item');
-  const map = {'config':0,'record':1,'create-record':2,'dup-found':3,'no-dup':4,'matching':5,'merge':6,'unique-subset':7,'permission':8,'non-facial':9};
-  if (map[id] !== undefined && items[map[id]]) items[map[id]].classList.add('active');
+/* Dup popup selection */
+function updateDupSel(){
+  var n=document.querySelectorAll('.dup-sel:checked').length;
+  var t=document.querySelectorAll('.dup-sel').length;
+  document.getElementById('dupSelInfo').textContent=n+' of '+t+' records selected';
+  document.getElementById('btnMergeSel').disabled=n<1;
+  document.getElementById('btnUniSel').disabled=n<1;
+}
+function handleMarkAll(){
+  var c=document.getElementById('markNotDup').checked;
+  document.querySelectorAll('.dup-sel').forEach(function(cb){cb.checked=c});
+  updateDupSel();
+}
+function goMergeOne(){showScreen('matching')}
+function goMergeSelected(){showScreen('matching')}
+function goUniqueSelected(){showScreen('unique-subset')}
+
+/* Matching */
+function updateMatchCount(){
+  var n=document.querySelectorAll('.match-cb:checked').length;
+  document.getElementById('matchSelCount').textContent=n+' Records Selected';
+  document.querySelectorAll('.m-table tbody tr').forEach(function(tr){
+    tr.classList.toggle('selected',tr.querySelector('.match-cb').checked);
+  });
+}
+function clearMatchSel(){
+  document.querySelectorAll('.match-cb').forEach(function(c){c.checked=false});
+  updateMatchCount();
 }
 
-// ===== MODALS =====
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+/* Merge */
+function doMerge(){openModal('m-merge-ok')}
 
-// Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(ov => {
-  ov.addEventListener('click', e => { if (e.target === ov) ov.classList.add('hidden'); });
-});
-
-// ===== CONFIG: ADD MODULE =====
-function openAddModule() { openModal('modal-add-module'); }
-function addModule() {
-  const sel = document.getElementById('moduleSelect');
-  if (!sel.value) return;
-  const tbody = document.getElementById('moduleTableBody');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>${sel.value}</td>
-    <td><div class="created-by"><div class="av">PS</div>${new Date().toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'})}</div></td>
-    <td><div class="status-icon"><label class="status-toggle"><input type="checkbox" disabled><span class="slider"></span></label><div class="spinner"></div></div></td>
-    <td><button class="delete-btn" onclick="confirmDelete('${sel.value}')">&#128465;</button></td>
-  `;
-  tbody.appendChild(tr);
-  sel.value = '';
-  closeModal('modal-add-module');
+/* Unique */
+function toggleAllUniq(){
+  var v=document.getElementById('markAllUniq').checked;
+  document.querySelectorAll('.uniq-cb').forEach(function(c){c.checked=v});
+  updateUniqCount();
 }
-
-// ===== CONFIG: DELETE =====
-function confirmDelete(mod) {
-  document.getElementById('deleteMsg').innerHTML = `The deduplication model for <strong>${mod}</strong> will be removed and no more duplicates can be found based on similar images.`;
-  openModal('modal-delete');
+function updateUniqCount(){
+  var n=document.querySelectorAll('.uniq-cb:checked').length;
+  var t=document.querySelectorAll('.uniq-cb').length;
+  document.getElementById('uniqCount').textContent=n+' / '+t+' selected';
 }
+function applyUniq(){openModal('m-uniq-ok')}
 
-// ===== CONFIG: TOGGLE =====
-function toggleModule(cb, mod) {
-  if (!cb.checked) {
-    cb.checked = true; // revert, show confirm first
-    document.getElementById('deactivateMsg').innerHTML = `The image deduplication model for <strong>${mod}</strong> will no longer receive new images for training, and upon deactivation, it won't identify duplicates for the module's record images.`;
-    openModal('modal-deactivate');
-  }
-}
-
-// ===== UNIQUE SUBSET =====
-function toggleAllUnique() {
-  const all = document.getElementById('markAllUnique').checked;
-  document.querySelectorAll('#uniqueSubsetList .unique-cb').forEach(cb => { cb.checked = all; });
-  updateUniqueCount();
-}
-function updateUniqueCount() {
-  const n = document.querySelectorAll('#uniqueSubsetList .unique-cb:checked').length;
-  document.getElementById('uniqueSelCount').textContent = n + ' selected';
-}
-function applyUniqueSubset() {
-  openModal('modal-unique-applied');
-}
-
-// ===== MERGE SUCCESS =====
-function mergeSuccess() {
-  openModal('modal-merge-success');
-}
-
-// Close banners
-document.querySelectorAll('.close-banner').forEach(btn => {
-  btn.addEventListener('click', () => btn.parentElement.style.display = 'none');
-});
-
-// Init
 showScreen('config');
 </script>
 </body>
